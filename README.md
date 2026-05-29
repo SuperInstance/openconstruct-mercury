@@ -1,71 +1,38 @@
-# OpenConstruct Mercury Verification Suite
+# OpenConstruct Mercury — Formal Verification Suite
 
-Formal verification of OpenConstruct's core invariants using Mercury — a logic/functional language with compile-time determinism checking and total function guarantees.
+Prove OpenConstruct's core invariants using [Mercury](https://mercurylang.org/) — a logic/functional language with compile-time determinism checking and total function guarantees. Where Rust gives memory safety, Mercury gives mathematical correctness.
 
-## Why Mercury?
+**Part of [SuperInstance OpenConstruct](https://github.com/SuperInstance/OpenConstruct).**
 
-Rust gives us memory safety and runtime performance. Mercury gives us **mathematical correctness**:
+## What This Gives You
 
-- **Total functions**: Every predicate declares its determinism. The compiler proves termination.
-- **No runtime panics**: No `unwrap()`, no `undefined behavior`, no exceptions.
-- **Constructive proofs**: Properties are proven by construction, not by testing.
-- **Mode system**: Input/output modes are checked at compile time.
+- **Policy consistency** — prove no conflicting allow/deny rules exist
+- **Conservation ratio correctness** — prove CR ∈ [0.0, 1.0] for all graphs
+- **Typed sensory pipelines** — compile-time enforcement: vision shadows can't reach sonar processors
+- **Fleet topology proofs** — star topology, mesh connectivity, resource satisfaction
+- **Total functions** — every predicate declares determinism; the compiler proves termination
 
-This is the formal methods layer. Rust handles the real-time sensor processing; Mercury proves the system can't enter invalid states.
-
-## Modules
-
-### `policy_verify.m` — Policy Consistency Checking
-- Verifies policy sets have no conflicting allow/deny rules
-- Detects shadowed and redundant policies
-- Finds orphan wildcard denies
-- Proves evaluation always terminates (deny-by-default)
-
-### `cr_verify.m` — Conservation Ratio Correctness
-- Proves CR is always in [0.0, 1.0]
-- Proves CR of empty graph = 0.0
-- Plato Room CR: verified tiles / total tiles
-- Suggests next tile to verify (unverified with satisfied deps)
-- Finds missing bridges (tiles blocking verification)
-
-### `sense_typecheck.m` — Typed Sensory Pipelines
-- Each sense has its own typed shadow format
-- Vision shadows can't be fed to sonar processors (compile-time)
-- Fused events are well-typed combinations
-- Severity classification is type-safe
-
-### `fleet_prove.m` — Fleet Topology Proofs
-- Proves star topology (Jetson hub + ESP32 spokes)
-- Proves mesh connectivity (all nodes reachable)
-- Resource satisfaction (every task finds a capable node)
-- ESP32-as-room conversion is correct by construction
-
-### `openconstruct.m` — Verification Runner
-- Runs all verification modules
-- Reports results with proofs
-
-## Building
+## Quick Start
 
 ```bash
 mmc --make openconstruct
 ./openconstruct
 ```
 
-## Architecture
+## Modules
 
-```
-┌─────────────────────────────────────────────────┐
-│                OpenConstruct                     │
-├────────────────────┬────────────────────────────┤
-│   Runtime (Rust)   │   Verification (Mercury)   │
-│   • Senses         │   • Policy proofs           │
-│   • Fleet          │   • CR correctness          │
-│   • Shell          │   • Type safety             │
-│   • Mesh           │   • Topology proofs         │
-│   • Fast paths     │   • Total functions         │
-└────────────────────┴────────────────────────────┘
-```
+| Module | What It Proves |
+|--------|---------------|
+| `policy_verify.m` | No conflicting policies, no shadowed rules, deny-by-default termination |
+| `cr_verify.m` | CR ∈ [0, 1], empty graph → CR = 0, suggests next tile to verify |
+| `sense_typecheck.m` | Vision ≠ sonar at compile time, fused events are well-typed |
+| `fleet_prove.m` | Star topology, mesh connectivity, resource satisfaction |
+| `openconstruct.m` | Verification runner — executes all proofs |
 
-Rust is the engine. Mercury is the proof.
+## How It Fits
 
-Part of the [SuperInstance OpenConstruct](https://github.com/SuperInstance/OpenConstruct) ecosystem.
+Mercury is the formal methods layer. The [Rust SDK](https://github.com/SuperInstance/openconstruct-rust) handles runtime; Mercury proves the runtime can't enter invalid states. If Mercury says a property holds, no amount of runtime testing can violate it.
+
+## License
+
+MIT
